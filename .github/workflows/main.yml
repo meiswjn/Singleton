@@ -36,14 +36,35 @@ jobs:
 
       # Upload the generated documentation
       - name: Upload site artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v1
         with:
           name: _site
           path: _site # Must equals the 'build.dest' value on your docfx.json
-      
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+      - run: |
+         ls -al
+         ls -al _site         
+    # Deploy the generated documentation to the gh-pages branch
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        # with:
+        #   submodules: true
+
+      # Download the generated documentation
+      - name: Download site artifact
+        uses: actions/download-artifact@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: _site
+          name: _site
+          path: _site
+      - run: |
+          ls -al
+          ls -al _site
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.0.0
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: _site # The folder the action should deploy.
